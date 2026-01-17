@@ -2,7 +2,7 @@
 
 Un tema personalizado para **Oh My Posh** con un script de bienvenida tipo "Dashboard" para PowerShell.
 
-![Preview](terminal_preview_1768681494438.png) ![PowerShell](https://img.shields.io/badge/Shell-PowerShell-5391FE?logo=powershell&logoColor=white)
+![Preview](picture.png) ![PowerShell](https://img.shields.io/badge/Shell-PowerShell-5391FE?logo=powershell&logoColor=white)
 
 ## 📂 Archivos
 
