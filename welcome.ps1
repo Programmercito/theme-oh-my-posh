@@ -1,49 +1,93 @@
 $e = [char]27
 $esc = "$e["
 
-# Theme Colors (Approximate matches)
-$blue = "$esc;38;2;122;162;247m"
-$purple = "$esc;38;2;187;154;247m"
-$green = "$esc;38;2;158;206;106m"
-$text = "$esc;38;2;192;202;245m"
-$reset = "$esc;0m"
+# Theme Colors (Tokyo Night inspired)
+$c_blue   = "$esc;38;2;122;162;247m"
+$c_purple = "$esc;38;2;187;154;247m"
+$c_green  = "$esc;38;2;158;206;106m"
+$c_yellow = "$esc;38;2;224;175;104m"
+$c_orange = "$esc;38;2;255;158;100m"
+$c_cyan   = "$esc;38;2;125;207;255m"
+$c_red    = "$esc;38;2;247;118;142m"
+$c_text   = "$esc;38;2;192;202;245m"
+$c_grey   = "$esc;38;2;86;95;137m"
+$c_dark   = "$esc;38;2;26;27;38m"
+$reset    = "$esc;0m"
 
-# Clear screen for a fresh start
 Clear-Host
 
-# Get Date
-$date = Get-Date -Format "dddd, MMMM dd"
-$time = Get-Date -Format "HH:mm"
+# --- Version Helper ---
+function Get-Ver ($cmd, $arg) {
+    try {
+        if (Get-Command $cmd -ErrorAction SilentlyContinue) {
+            $out = (Invoke-Expression "$cmd $arg 2>&1" | Out-String)
+            if ($out -match '(\d+\.\d+\.\d+)') { return $matches[0] }
+            elseif ($out -match '(\d+\.\d+)') { return $matches[0] }
+        }
+    } catch {}
+    return "N/A"
+}
 
-# Greeting based on time
-$hour = (Get-Date).Hour
-if ($hour -lt 12) { $greeting = "Good Morning" }
-elseif ($hour -lt 19) { $greeting = "Good Afternoon" }
-else { $greeting = "Good Evening" }
+# --- System Stats ---
+$pc = $env:COMPUTERNAME
+$user = $env:USERNAME
+$memQuery = Get-CimInstance Win32_OperatingSystem
+$totalRAM = [math]::Round($memQuery.TotalVisibleMemorySize / 1MB, 2)
+$freeRAM  = [math]::Round($memQuery.FreePhysicalMemory / 1MB, 2)
+$usedRAM  = [math]::Round($totalRAM - $freeRAM, 2)
+$ramPercent = [math]::Round(($usedRAM / $totalRAM) * 100, 0)
 
-# System Info (Fast)
-$os = (Get-CimInstance Win32_OperatingSystem).Caption.Trim().Replace("Microsoft ", "")
-$mem = Get-CimInstance Win32_OperatingSystem
-$totalMem = [math]::Round($mem.TotalVisibleMemorySize / 1MB, 1)
-$freeMem = [math]::Round($mem.FreePhysicalMemory / 1MB, 1)
-$usedMem = [math]::Round($totalMem - $freeMem, 1)
+# Icons
+$i_user = [char]0xf007
+$i_pc   = [char]0xf108
+$i_ram  = [char]0xf2db
+$i_node = [char]0xe718
+$i_java = [char]0xe738
+$i_php  = [char]0xe73d
+$i_news = [char]0xf1ea
+$i_link = [char]0xf0c1
+$i_dot  = [char]0xf111
 
-# Random minimal quote
-$quotes = @(
-    "Code is like humor. When you have to explain it, it's bad.",
-    "First, solve the problem. Then, write the code.",
-    "Simplicity is the soul of efficiency.",
-    "Make it work, make it right, make it fast.",
-    "Talk is cheap. Show me the code."
-)
-$quote = $quotes | Get-Random
+# --- Fetch Versions ---
+$v_node = Get-Ver "node" "-v"
+$v_java = Get-Ver "java" "-version"
+$v_php  = Get-Ver "php" "-v"
 
-# Render
+# --- Fetch Tech News ---
+$newsTitle = "Fetching latest headlines..."
+$newsUrl = ""
+try {
+    $response = Invoke-RestMethod -Uri "https://saurav.tech/NewsAPI/top-headlines/category/technology/us.json" -TimeoutSec 1 -ErrorAction Stop
+    $article = $response.articles | Select-Object -First 10 | Get-Random
+    $newsTitle = $article.title
+    $newsUrl = $article.url
+} catch {
+    $newsTitle = "Offline mode"
+    $newsUrl = ""
+}
+
+# --- Render Function (3-Column Layout) ---
+function Print-Row ($icon1, $color1, $text1, $icon2, $color2, $text2, $icon3, $color3, $text3) {
+    Write-Host "  $color1$icon1 $text1  $color2$icon2 $text2  $color3$icon3 $text3$reset"
+}
+
+# --- Visual Dashboard ---
 Write-Host ""
-Write-Host "  $blue$greeting, $env:USERNAME$reset"
-Write-Host "  $text$date $purple$time$reset"
+Write-Host "  $c_purple$i_user $user $c_grey@ $c_blue$i_pc $pc $reset"
+Write-Host "  $c_grey$('-'*50)$reset"
+
+# Stats & Versions Row
+Write-Host "  $c_cyan$i_ram  RAM  $reset$c_text${usedRAM}GB / ${totalRAM}GB ($ramPercent%)$reset"
 Write-Host ""
-Write-Host "  $green$quote$reset"
-Write-Host ""
-Write-Host "  $text$os $reset| $purple RAM: ${usedMem}GB / ${totalMem}GB$reset"
+Write-Host "  $c_green$i_node Node $reset$c_text$v_node$reset    $c_orange$i_java Java $reset$c_text$v_java$reset    $c_blue$i_php PHP  $reset$c_text$v_php$reset"
+Write-Host "  $c_grey$('-'*50)$reset"
+
+# News Section with "Card" styling
+Write-Host "  $c_yellow$i_news TODAY'S TECH NEWS:$reset"
+# Wrap title if too long (basic truncation)
+if ($newsTitle.Length -gt 75) { $newsTitle = $newsTitle.Substring(0, 72) + "..." }
+Write-Host "  $c_text$newsTitle$reset"
+if ($newsUrl) {
+    Write-Host "  $c_grey$i_link $newsUrl$reset"
+}
 Write-Host ""
