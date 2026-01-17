@@ -1,0 +1,200 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "blocks": [
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "background": "transparent",
+          "foreground": "#7aa2f7",
+          "foreground_templates": [
+            "{{ if .Root }}#f7768e{{ end }}"
+          ],
+          "style": "plain",
+          "template": " {{ if .Root }}\uf0e7{{ else }}\uf007{{ end }} {{ .UserName }} ",
+          "type": "session"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#bb9af7",
+          "options": {
+            "style": "folder"
+          },
+          "style": "plain",
+          "template": " \ue5ff {{ .Path }} ",
+          "type": "path"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#9ece6a",
+          "foreground_templates": [
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}#ff9e64{{ end }}",
+            "{{ if and (gt .Ahead 0) (gt .Behind 0) }}#e0af68{{ end }}",
+            "{{ if gt .Ahead 0 }}#7dcfff{{ end }}",
+            "{{ if gt .Behind 0 }}#bb9af7{{ end }}"
+          ],
+          "options": {
+            "branch_icon": "\ue725 ",
+            "fetch_status": true,
+            "fetch_upstream_icon": true
+          },
+          "style": "plain",
+          "template": " {{ .UpstreamIcon }}{{ .HEAD }}{{ if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }} ",
+          "type": "git"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#7dcfff",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue235 {{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }} ",
+          "type": "python"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#73daca",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue718 {{ .Full }} ",
+          "type": "node"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#f89820",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue738 {{ .Full }} ",
+          "type": "java"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#7dcfff",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue626 {{ .Full }} ",
+          "type": "go"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#f7768e",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue791 {{ .Full }} ",
+          "type": "ruby"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#bb9af7",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue624 {{ .Full }} ",
+          "type": "julia"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#ff9e64",
+          "options": {
+            "fetch_version": true,
+            "display_mode": "context"
+          },
+          "style": "plain",
+          "template": " \ue7a8 {{ .Full }} ",
+          "type": "rust"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#c0caf5",
+          "foreground_templates": [
+            "{{if eq \"Charging\" .State.String}}#9ece6a{{end}}",
+            "{{if eq \"Discharging\" .State.String}}#f7768e{{end}}",
+            "{{if eq \"Full\" .State.String}}#7dcfff{{end}}"
+          ],
+          "options": {
+            "charged_icon": "\uf240 ",
+            "charging_icon": "\uf1e6 ",
+            "discharging_icon": "\uf243 "
+          },
+          "style": "plain",
+          "template": " {{ if not .Error }}{{ .Icon }}{{ .Percentage }}{{ end }}{{ .Error }} ",
+          "type": "battery"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#e0af68",
+          "options": {
+            "time_format": "15:04"
+          },
+          "style": "plain",
+          "template": " \uf017 {{ .CurrentDate | date .Format }} ",
+          "type": "time"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "background": "transparent",
+          "foreground": "#565f89",
+          "options": {
+            "style": "austin",
+            "threshold": 500,
+            "always_enabled": true
+          },
+          "style": "plain",
+          "template": " \uf252 {{ .FormattedMs }} ",
+          "type": "executiontime"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#9ece6a",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}#f7768e{{ end }}"
+          ],
+          "options": {
+            "always_enabled": true
+          },
+          "style": "plain",
+          "template": " {{ if gt .Code 0 }}\uf00d{{ else }}\uf00c{{ end }} ",
+          "type": "status"
+        },
+        {
+          "background": "transparent",
+          "foreground": "#7aa2f7",
+          "style": "plain",
+          "template": "\u276f ",
+          "type": "text"
+        }
+      ],
+      "type": "prompt"
+    }
+  ],
+  "console_title_template": "{{ .Folder }}{{ if .Root }} (Admin){{ end }}",
+  "transient_prompt": {
+    "background": "transparent",
+    "foreground": "#7aa2f7",
+    "template": "\u276f "
+  },
+  "final_space": true,
+  "version": 3
+}
