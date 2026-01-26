@@ -57,8 +57,9 @@ $v_php  = Get-Ver "php" "-v"
 $newsTitle = "Fetching latest headlines..."
 $newsUrl = ""
 try {
-    $response = Invoke-RestMethod -Uri "https://saurav.tech/NewsAPI/top-headlines/category/technology/us.json" -TimeoutSec 1 -ErrorAction Stop
-    $article = $response.articles | Select-Object -First 10 | Get-Random
+    # Using HNPWA API (Hacker News) for fresher content
+    $response = Invoke-RestMethod -Uri "https://api.hnpwa.com/v0/news/1.json" -TimeoutSec 2 -ErrorAction Stop
+    $article = $response | Select-Object -First 10 | Get-Random
     $newsTitle = $article.title
     $newsUrl = $article.url
 } catch {
