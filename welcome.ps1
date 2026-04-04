@@ -23,6 +23,7 @@ function Get-Ver ($cmd, $arg) {
             $out = (Invoke-Expression "$cmd $arg 2>&1" | Out-String)
             if ($out -match '(\d+\.\d+\.\d+)') { return $matches[0] }
             elseif ($out -match '(\d+\.\d+)') { return $matches[0] }
+            elseif ($out -match '(\d+)') { return $matches[0] }
         }
     } catch {}
     return "N/A"
