@@ -77,11 +77,17 @@ function Print-Row ($icon1, $color1, $text1, $icon2, $color2, $text2, $icon3, $c
     Write-Host "  $color1$icon1 $text1  $color2$icon2 $text2  $color3$icon3 $text3$reset"
 }
 
+# --- Matrix-style green shades ---
+$m1 = "$esc;38;2;0;255;65m"    # Bright Matrix green
+$m2 = "$esc;38;2;57;255;20m"   # Neon green
+$m3 = "$esc;38;2;0;204;51m"    # Mid green
+$m4 = "$esc;38;2;0;143;17m"    # Dark green
+
 # --- Visual Dashboard ---
 Write-Host ""
-Write-Host "  $c_blue╔╦╗$c_cyan╔═╗$c_green╦  ╦  $c_purple╔╦╗$c_orange╔═╗$c_yellow╔╦╗$c_red╔═╗$reset"
-Write-Host "  $c_blue ║║$c_cyan║╣ $c_green╚╗╔╝  $c_purple║║║$c_orange║ ║$c_yellow ║║$c_red║╣$reset"
-Write-Host "  $c_blue═╩╝$c_cyan╚═╝$c_green ╚╝   $c_purple╩ ╩$c_orange╚═╝$c_yellow═╩╝$c_red╚═╝$reset"
+Write-Host "  $m1╔╦╗$m2╔═╗$m1╦  ╦  $m3╔╦╗$m2╔═╗$m3╔╦╗$m4╔═╗$reset"
+Write-Host "  $m1 ║║$m2║╣ $m1╚╗╔╝  $m3║║║$m2║ ║$m3 ║║$m4║╣$reset"
+Write-Host "  $m1═╩╝$m2╚═╝$m1 ╚╝   $m3╩ ╩$m2╚═╝$m3═╩╝$m4╚═╝$reset"
 Write-Host ""
 Write-Host "  $c_purple$i_user $user $c_grey@ $c_blue$i_pc $pc $reset"
 Write-Host "  $c_grey$('-'*50)$reset"
