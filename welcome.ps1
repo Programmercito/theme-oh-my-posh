@@ -1,18 +1,12 @@
 $e = [char]27
 $esc = "$e["
 
-# Theme Colors (Tokyo Night inspired)
-$c_blue   = "$esc;38;2;122;162;247m"
-$c_purple = "$esc;38;2;187;154;247m"
-$c_green  = "$esc;38;2;158;206;106m"
-$c_yellow = "$esc;38;2;224;175;104m"
-$c_orange = "$esc;38;2;255;158;100m"
-$c_cyan   = "$esc;38;2;125;207;255m"
-$c_red    = "$esc;38;2;247;118;142m"
-$c_text   = "$esc;38;2;192;202;245m"
-$c_grey   = "$esc;38;2;86;95;137m"
-$c_dark   = "$esc;38;2;26;27;38m"
-$reset    = "$esc;0m"
+# Matrix Colors
+$m1 = "$esc;38;2;0;255;65m"    # Bright Matrix green
+$m2 = "$esc;38;2;57;255;20m"   # Neon green
+$m3 = "$esc;38;2;0;204;51m"    # Mid green
+$m4 = "$esc;38;2;0;143;17m"    # Dark green
+$reset = "$esc;0m"
 
 Clear-Host
 
@@ -50,7 +44,6 @@ $i_php  = [char]0xe73d
 $i_go   = [char]0xe626
 $i_news = [char]0xf1ea
 $i_link = [char]0xf0c1
-$i_dot  = [char]0xf111
 
 # --- Fetch Versions ---
 $v_node = Get-Ver "node" "-v"
@@ -72,38 +65,35 @@ try {
     $newsUrl = ""
 }
 
-# --- Render Function (3-Column Layout) ---
-function Print-Row ($icon1, $color1, $text1, $icon2, $color2, $text2, $icon3, $color3, $text3) {
-    Write-Host "  $color1$icon1 $text1  $color2$icon2 $text2  $color3$icon3 $text3$reset"
-}
+# --- Time Greeting ---
+$hour = (Get-Date).Hour
+$greeting = if ($hour -lt 6) { "Night owl mode" } elseif ($hour -lt 12) { "Morning init" } elseif ($hour -lt 18) { "Afternoon session" } else { "Night mode" }
+$timeNow = Get-Date -Format "HH:mm:ss"
 
-# --- Matrix-style green shades ---
-$m1 = "$esc;38;2;0;255;65m"    # Bright Matrix green
-$m2 = "$esc;38;2;57;255;20m"   # Neon green
-$m3 = "$esc;38;2;0;204;51m"    # Mid green
-$m4 = "$esc;38;2;0;143;17m"    # Dark green
+# --- RAM Bar ---
+$barLen = 20
+$filled = [math]::Round(($ramPercent / 100) * $barLen)
+$empty = $barLen - $filled
+$ramBar = "$m1$("█" * $filled)$m4$("░" * $empty)$reset"
 
 # --- Visual Dashboard ---
 Write-Host ""
-Write-Host "  $m1╔╦╗$m2╔═╗$m1╦  ╦  $m3╔╦╗$m2╔═╗$m3╔╦╗$m4╔═╗$reset"
-Write-Host "  $m1 ║║$m2║╣ $m1╚╗╔╝  $m3║║║$m2║ ║$m3 ║║$m4║╣$reset"
-Write-Host "  $m1═╩╝$m2╚═╝$m1 ╚╝   $m3╩ ╩$m2╚═╝$m3═╩╝$m4╚═╝$reset"
+Write-Host "  $m4░▒▓$m1╔╦╗$m2╔═╗$m1╦  ╦  $m3╔╦╗$m2╔═╗$m3╔╦╗$m4╔═╗$m4▓▒░$reset"
+Write-Host "  $m4   $m1 ║║$m2║╣ $m1╚╗╔╝  $m3║║║$m2║ ║$m3 ║║$m4║╣$reset"
+Write-Host "  $m4░▒▓$m1═╩╝$m2╚═╝$m1 ╚╝   $m3╩ ╩$m2╚═╝$m3═╩╝$m4╚═╝$m4▓▒░$reset"
 Write-Host ""
-Write-Host "  $c_purple$i_user $user $c_grey@ $c_blue$i_pc $pc $reset"
-Write-Host "  $c_grey$('-'*50)$reset"
-
-# Stats & Versions Row
-Write-Host "  $c_cyan$i_ram  RAM  $reset$c_text${usedRAM}GB / ${totalRAM}GB ($ramPercent%)$reset"
+Write-Host "  $m1$i_user $user $m4@ $m2$i_pc $pc      $m3$greeting $m4[$m2$timeNow$m4]$reset"
+Write-Host "  $m4$('─' * 55)$reset"
+Write-Host "  $m1$i_ram RAM  $reset$ramBar  $m2${usedRAM}$m4/$m3${totalRAM}GB $m1${ramPercent}%$reset"
 Write-Host ""
-Write-Host "  $c_green$i_node Node $reset$c_text$v_node$reset    $c_orange$i_java Java $reset$c_text$v_java$reset    $c_blue$i_php PHP  $reset$c_text$v_php$reset    $c_cyan$i_go Go $reset$c_text$v_go$reset"
-Write-Host "  $c_grey$('-'*50)$reset"
-
-# News Section with "Card" styling
-Write-Host "  $c_yellow$i_news TODAY'S TECH NEWS:$reset"
-# Wrap title if too long (basic truncation)
+Write-Host "  $m1$i_node Node $m2$v_node    $m3$i_java Java $m2$v_java    $m1$i_php PHP $m2$v_php    $m3$i_go Go $m2$v_go$reset"
+Write-Host "  $m4$('─' * 55)$reset"
+Write-Host "  $m1$i_news $m3TECH NEWS$reset"
 if ($newsTitle.Length -gt 75) { $newsTitle = $newsTitle.Substring(0, 72) + "..." }
-Write-Host "  $c_text$newsTitle$reset"
+Write-Host "  $m2$newsTitle$reset"
 if ($newsUrl) {
-    Write-Host "  $c_grey$i_link $newsUrl$reset"
+    Write-Host "  $m4$i_link $newsUrl$reset"
 }
+Write-Host ""
+Write-Host "  $m4░ $m3System ready $m4░ $m1> $m2Wake up, $user...$reset"
 Write-Host ""
