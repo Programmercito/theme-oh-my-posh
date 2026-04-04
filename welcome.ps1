@@ -44,6 +44,7 @@ $i_ram  = [char]0xf2db
 $i_node = [char]0xe718
 $i_java = [char]0xe738
 $i_php  = [char]0xe73d
+$i_go   = [char]0xe626
 $i_news = [char]0xf1ea
 $i_link = [char]0xf0c1
 $i_dot  = [char]0xf111
@@ -52,6 +53,7 @@ $i_dot  = [char]0xf111
 $v_node = Get-Ver "node" "-v"
 $v_java = Get-Ver "java" "-version"
 $v_php  = Get-Ver "php" "-v"
+$v_go   = Get-Ver "go" "version"
 
 # --- Fetch Tech News ---
 $newsTitle = "Fetching latest headlines..."
@@ -80,7 +82,7 @@ Write-Host "  $c_grey$('-'*50)$reset"
 # Stats & Versions Row
 Write-Host "  $c_cyan$i_ram  RAM  $reset$c_text${usedRAM}GB / ${totalRAM}GB ($ramPercent%)$reset"
 Write-Host ""
-Write-Host "  $c_green$i_node Node $reset$c_text$v_node$reset    $c_orange$i_java Java $reset$c_text$v_java$reset    $c_blue$i_php PHP  $reset$c_text$v_php$reset"
+Write-Host "  $c_green$i_node Node $reset$c_text$v_node$reset    $c_orange$i_java Java $reset$c_text$v_java$reset    $c_blue$i_php PHP  $reset$c_text$v_php$reset    $c_cyan$i_go Go $reset$c_text$v_go$reset"
 Write-Host "  $c_grey$('-'*50)$reset"
 
 # News Section with "Card" styling
