@@ -21,7 +21,9 @@ function Get-Ver ($cmd, $arg) {
     try {
         if (Get-Command $cmd -ErrorAction SilentlyContinue) {
             $out = (Invoke-Expression "$cmd $arg 2>&1" | Out-String)
-            if ($out -match '(\d+\.\d+\.\d+)') { return $matches[0] }
+            # Specific check for Java/Quoted versions with context (LTS/Dates)
+            if ($out -match '"([^"]+)"\s+(.*LTS.*)') { return "$($matches[1]) $($matches[2])".Trim() }
+            elseif ($out -match '(\d+\.\d+\.\d+)') { return $matches[0] }
             elseif ($out -match '(\d+\.\d+)') { return $matches[0] }
             elseif ($out -match '(\d+)') { return $matches[0] }
         }
