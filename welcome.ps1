@@ -79,6 +79,10 @@ function Print-Row ($icon1, $color1, $text1, $icon2, $color2, $text2, $icon3, $c
 
 # --- Visual Dashboard ---
 Write-Host ""
+Write-Host "  $c_blue╔╦╗$c_cyan╔═╗$c_green╦  ╦  $c_purple╔╦╗$c_orange╔═╗$c_yellow╔╦╗$c_red╔═╗$reset"
+Write-Host "  $c_blue ║║$c_cyan║╣ $c_green╚╗╔╝  $c_purple║║║$c_orange║ ║$c_yellow ║║$c_red║╣$reset"
+Write-Host "  $c_blue═╩╝$c_cyan╚═╝$c_green ╚╝   $c_purple╩ ╩$c_orange╚═╝$c_yellow═╩╝$c_red╚═╝$reset"
+Write-Host ""
 Write-Host "  $c_purple$i_user $user $c_grey@ $c_blue$i_pc $pc $reset"
 Write-Host "  $c_grey$('-'*50)$reset"
 
