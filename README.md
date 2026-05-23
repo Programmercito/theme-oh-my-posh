@@ -22,7 +22,7 @@ El proyecto consta de dos archivos principales que deben estar en tu carpeta de 
 Para activar el tema y el mensaje de bienvenida, necesitas editar tu perfil de PowerShell.
 
 1.  Abre o crea tu perfil ejecutando en la terminal:
-    ```powershell
+    ```powershell 
     code $PROFILE
     ```
 
