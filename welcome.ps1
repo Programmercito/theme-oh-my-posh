@@ -1,4 +1,4 @@
-﻿[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $pc = $env:COMPUTERNAME
 $user = $env:USERNAME
@@ -50,7 +50,7 @@ if ($cache -and $cache.articles -and $cache.articles.Count -gt 0) {
     function Get-Ver-Sync ($cmd, $arg) {
         try {
             if (Get-Command $cmd -ErrorAction SilentlyContinue) {
-                $out = (Invoke-Expression "$cmd $arg 2>&1" | Out-String)
+                $out = & $cmd $arg 2>&1 | Out-String
                 if ($out -match '"([^"]+)"\s+(.*LTS.*)') { return "$($matches[1]) $($matches[2])".Trim() }
                 elseif ($out -match '(\d+\.\d+\.\d+)') { return $matches[0] }
                 elseif ($out -match '(\d+\.\d+)') { return $matches[0] }
@@ -98,50 +98,55 @@ if ($cache -and $cache.articles -and $cache.articles.Count -gt 0) {
 }
 
 if ($needsUpdate) {
-    $bgScript = "$env:TEMP\devcito_bg.ps1"
-    $bgCode = @"
-param(`$path)
-function Get-Ver (`$cmd, `$arg) {
-    try {
-        if (Get-Command `$cmd -ErrorAction SilentlyContinue) {
-            `$out = (Invoke-Expression "`$cmd `$arg 2>&1" | Out-String)
-            if (`$out -match '\"([^\"]+)\"\s+(.*LTS.*)') { return "`$(`$matches[1]) `$(`$matches[2])".Trim() }
-            elseif (`$out -match '(\d+\.\d+\.\d+)') { return `$matches[0] }
-            elseif (`$out -match '(\d+\.\d+)') { return `$matches[0] }
-            elseif (`$out -match '(\d+)') { return `$matches[0] }
+    $bgScript = {
+        param($path)
+        function Get-Ver ($cmd, $arg) {
+            try {
+                if (Get-Command $cmd -ErrorAction SilentlyContinue) {
+                    $out = & $cmd $arg 2>&1 | Out-String
+                    if ($out -match '"([^"]+)"\s+(.*LTS.*)') { return "$($matches[1]) $($matches[2])".Trim() }
+                    elseif ($out -match '(\d+\.\d+\.\d+)') { return $matches[0] }
+                    elseif ($out -match '(\d+\.\d+)') { return $matches[0] }
+                    elseif ($out -match '(\d+)') { return $matches[0] }
+                }
+            } catch {}
+            return "N/A"
         }
-    } catch {}
-    return "N/A"
-}
-`$v_n = Get-Ver "node" "-v"
-`$v_j = Get-Ver "java" "-version"
-`$v_p = Get-Ver "php" "-v"
-`$v_g = Get-Ver "go" "version"
+        $v_n = Get-Ver "node" "-v"
+        $v_j = Get-Ver "java" "-version"
+        $v_p = Get-Ver "php" "-v"
+        $v_g = Get-Ver "go" "version"
 
-`$articlesList = @()
-try {
-    `$response = Invoke-RestMethod -Uri "https://api.hnpwa.com/v0/news/1.json" -TimeoutSec 5
-    foreach (`$item in (`$response | Select-Object -First 20)) {
-        `$url = `$item.url
-        if (`$url -and `$url -like "item?id=*") {
-            `$url = "https://news.ycombinator.com/" + `$url
+        $articlesList = @()
+        try {
+            $response = Invoke-RestMethod -Uri "https://api.hnpwa.com/v0/news/1.json" -TimeoutSec 5
+            foreach ($item in ($response | Select-Object -First 20)) {
+                $url = $item.url
+                if ($url -and $url -like "item?id=*") {
+                    $url = "https://news.ycombinator.com/" + $url
+                }
+                $articlesList += @{ title = $item.title; url = $url }
+            }
+        } catch {}
+
+        $cacheObj = @{
+            timestamp = (Get-Date).ToString("o")
+            node = $v_n
+            java = $v_j
+            php = $v_p
+            go = $v_g
+            articles = $articlesList
         }
-        `$articlesList += @{ title = `$item.title; url = `$url }
+        $cacheObj | ConvertTo-Json | Out-File -FilePath $path -Encoding utf8 -Force
     }
-} catch {}
 
-`$cacheObj = @{
-    timestamp = (Get-Date).ToString("o")
-    node = `$v_n
-    java = `$v_j
-    php = `$v_p
-    go = `$v_g
-    articles = `$articlesList
-}
-`$cacheObj | ConvertTo-Json | Out-File -FilePath `$path -Encoding utf8 -Force
-"@
-    $bgCode | Out-File -FilePath $bgScript -Encoding utf8 -Force
-    Start-Process powershell.exe -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", $bgScript, $cacheFile)
+    if (Get-Command Start-Job -ErrorAction SilentlyContinue) {
+        Start-Job -ScriptBlock $bgScript -ArgumentList $cacheFile | Out-Null
+    } elseif (Get-Command Start-ThreadJob -ErrorAction SilentlyContinue) {
+        Start-ThreadJob -ScriptBlock $bgScript -ArgumentList $cacheFile | Out-Null
+    } else {
+        & $bgScript $cacheFile
+    }
 }
 
 # --- Dynamic System Stats ---
@@ -262,4 +267,5 @@ Write-Host "  $c_vr" -ForegroundColor Green
 # Line 8: Bottom Border (Matching top line width)
 Write-Host ("  " + $c_ll + ([string]$c_hz * 72)) -ForegroundColor Green
 Write-Host ""
+
 
